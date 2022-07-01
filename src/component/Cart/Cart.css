@@ -1,0 +1,8 @@
+
+.review-btn{
+    background-color: goldenrod;
+    width: 200px;
+    height: 30px;
+    border: 1px solid lightslategray;
+    cursor: pointer;
+}
