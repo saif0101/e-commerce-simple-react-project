@@ -2,14 +2,28 @@
 {
 height: 80px;
 }
-.header{
-    text-align: center;
+.logo{
+    /* font-family: 'Rubik Moonrocks', cursive; */
+    font-family: 'Splash', cursive;
+
 }
-.header nav{
+.header{
+    display: flex;
+    text-align: center;
+    background-color: black;
+    color: white;
+    font-size:30px;
+    font-weight: 600;
+    padding:10px;
+
+}
+.navbar{
     background-color: black;
     padding: 5px;
     line-height: 40px;
     font-size: 20px;
+    margin-right: 40px;
+    font-family:  'Finlandica', sans-serif;;
 
 }
 nav a{
@@ -20,4 +34,4 @@ nav a{
 }
 nav a:hover{
     background-color: gray;
-}
+} 

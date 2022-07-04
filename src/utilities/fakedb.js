@@ -1,42 +1,75 @@
-// use local storage to manage cart data
-const addToDb = id =>{
-    let shoppingCart = {};
-
-    //get the shopping cart from local storage
-    const storedCart = localStorage.getItem('shopping-cart');
-    if(storedCart){
-        shoppingCart = JSON.parse(storedCart);
-    }
-
-    // add quantity
-    const quantity = shoppingCart[id];
-    if(quantity){
-        const newQuantity = quantity + 1;
-        shoppingCart[id] = newQuantity;
-    }
-    else{
-        shoppingCart[id] = 1;
-    }
-    localStorage.setItem('shopping-cart', JSON.stringify(shoppingCart));
-}
-
-const removeFromDb = id =>{
-    const storedCart = localStorage.getItem('shopping-cart');
-    if(storedCart){
-        const shoppingCart = JSON.parse(storedCart);
-        if(id in shoppingCart){
-            delete shoppingCart[id];
-            localStorage.setItem('shopping-cart', JSON.stringify(shoppingCart));
-        }
+const getUser = () => {
+    const existingUser = sessionStorage.getItem('userId');
+    if (existingUser) {
+        return existingUser; 
+    } else {
+        const newUser = 'user-' + new Date().getTime();
+        sessionStorage.setItem('userId', newUser)
+        return newUser;
     }
 }
 
-const deleteShoppingCart = () =>{
-    localStorage.removeItem('shopping-cart');
+
+const getDataid = () => {
+    const userId = getUser();
+    return `emaJohn/carts/${userId}`
 }
 
-export {
-    addToDb, 
-    removeFromDb,
-    deleteShoppingCart
+// push to local storage: a temporary place for database
+const getDatabaseCart = () => {
+    const dataid = getDataid();
+    const data = localStorage.getItem(dataid) || "{}";
+    return JSON.parse(data);
 }
+
+const addToDatabaseCart = (id, count) => {
+    const currentCart = getDatabaseCart();
+    currentCart[id] = count;
+    localStorage.setItem(getDataid(), JSON.stringify(currentCart));
+}
+
+const removeFromDatabaseCart = id => {
+    const currentCart = getDatabaseCart();
+    delete currentCart[id];
+    localStorage.setItem(getDataid(), JSON.stringify(currentCart));
+}
+
+const processOrder = (cart) => {
+    localStorage.removeItem(getDataid());
+}
+
+
+export { addToDatabaseCart, getDatabaseCart, removeFromDatabaseCart, processOrder };
+
+
+// polyfill to support older browser
+const localStorage = window.localStorage || (() => {
+  let store = {}
+  return {
+    getItem(id) {
+      return store[id]
+    },
+    setItem(id, value) {
+      store[id] = value.toString()
+    },
+    clear() {
+      store = {}
+    }
+  };
+})()
+
+const sessionStorage = window.sessionStorage || (() => {
+  let store = {}
+  return {
+    getItem(id) {
+      return store[id]
+    },
+    setItem(id, value) {
+      store[id] = value.toString()
+    },
+    clear() {
+      store = {}
+    }
+  };
+})()
+// end of poly fill
