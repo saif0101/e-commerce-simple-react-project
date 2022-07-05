@@ -1,41 +1,41 @@
 const getUser = () => {
-    const existingUser = sessionStorage.getItem('userId');
+    const existingUser = sessionStorage.getItem('userkey');
     if (existingUser) {
         return existingUser; 
     } else {
         const newUser = 'user-' + new Date().getTime();
-        sessionStorage.setItem('userId', newUser)
+        sessionStorage.setItem('userkey', newUser)
         return newUser;
     }
 }
 
 
-const getDataid = () => {
-    const userId = getUser();
-    return `emaJohn/carts/${userId}`
+const getDatakey = () => {
+    const userkey = getUser();
+    return `emaJohn/carts/${userkey}`
 }
 
 // push to local storage: a temporary place for database
 const getDatabaseCart = () => {
-    const dataid = getDataid();
-    const data = localStorage.getItem(dataid) || "{}";
+    const datakey = getDatakey();
+    const data = localStorage.getItem(datakey) || "{}";
     return JSON.parse(data);
 }
 
-const addToDatabaseCart = (id, count) => {
+const addToDatabaseCart = (key, count) => {
     const currentCart = getDatabaseCart();
-    currentCart[id] = count;
-    localStorage.setItem(getDataid(), JSON.stringify(currentCart));
+    currentCart[key] = count;
+    localStorage.setItem(getDatakey(), JSON.stringify(currentCart));
 }
 
-const removeFromDatabaseCart = id => {
+const removeFromDatabaseCart = key => {
     const currentCart = getDatabaseCart();
-    delete currentCart[id];
-    localStorage.setItem(getDataid(), JSON.stringify(currentCart));
+    delete currentCart[key];
+    localStorage.setItem(getDatakey(), JSON.stringify(currentCart));
 }
 
 const processOrder = (cart) => {
-    localStorage.removeItem(getDataid());
+    localStorage.removeItem(getDatakey());
 }
 
 
@@ -46,11 +46,11 @@ export { addToDatabaseCart, getDatabaseCart, removeFromDatabaseCart, processOrde
 const localStorage = window.localStorage || (() => {
   let store = {}
   return {
-    getItem(id) {
-      return store[id]
+    getItem(key) {
+      return store[key]
     },
-    setItem(id, value) {
-      store[id] = value.toString()
+    setItem(key, value) {
+      store[key] = value.toString()
     },
     clear() {
       store = {}
@@ -61,11 +61,11 @@ const localStorage = window.localStorage || (() => {
 const sessionStorage = window.sessionStorage || (() => {
   let store = {}
   return {
-    getItem(id) {
-      return store[id]
+    getItem(key) {
+      return store[key]
     },
-    setItem(id, value) {
-      store[id] = value.toString()
+    setItem(key, value) {
+      store[key] = value.toString()
     },
     clear() {
       store = {}

@@ -5,6 +5,7 @@ height: 80px;
 .logo{
     /* font-family: 'Rubik Moonrocks', cursive; */
     font-family: 'Splash', cursive;
+    margin-left: 20px;
 
 }
 .header{
@@ -22,6 +23,7 @@ height: 80px;
     padding: 5px;
     line-height: 40px;
     font-size: 20px;
+    font-weight: 300;
     margin-right: 40px;
     font-family:  'Finlandica', sans-serif;;
 

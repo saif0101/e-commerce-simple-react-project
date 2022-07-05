@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import fakeData from '../../fakeData/products.json';
-import { addToDatabaseCart } from '../../utilities/fakedb';
+import { addToDatabaseCart, getDatabaseCart } from '../../utilities/fakedb';
 import Cart from '../Cart/Cart';
 import Product from '../Product/Product';
 import './Shop.css';
+import { NavLink } from 'react-router-dom';
 
 
 
@@ -22,27 +23,59 @@ const Shop = () => {
    const  [ products, setProducts]= useState(first10);
    const [cart,setCart] = useState([]);
 
+   useEffect(() => {
+    const savedCart = getDatabaseCart();
+    const productKeys = Object.keys (savedCart);
+    const previousCart = productKeys.map ((existingkey) => {
+        const product = fakeData.find ( (pd) => pd.key === existingkey);
+        product.quantity = savedCart[existingkey];
+        return product;
+    })
+    setCart(previousCart);
+
+   },[])
+
    const handleAddedProduct =(productadd)=>{
-    console.log('porduct added',productadd);
-    const newCart =[ ...cart,productadd];
+    const toBeAdded = productadd.key;
+    const sameProduct = cart.find( pd => pd.key === toBeAdded);
+    let count=1;
+    let newCart;
+    if (sameProduct){
+         count = sameProduct.quantity +1;
+        sameProduct.quantity = count;
+        const others = cart.filter ( pd => pd.key !== toBeAdded);
+        newCart =[...others,sameProduct];
+    }
+    else{
+        productadd.quantity =1;
+        newCart = [...cart,productadd];
+    }
+
     setCart(newCart);
-    const sameProduct = newCart.filter( pd => pd.id === productadd.id);
-    const count = sameProduct.length;
-    addToDatabaseCart(productadd.id,count);
+    addToDatabaseCart(productadd.key,count);
 
    }
 
     return (
         <div className='shop-container'>
             <div className='product-container'>
-           {products.map ( element=> <Product 
-            showAddCart ={true} product ={element}
-            handleAddedProduct ={handleAddedProduct}
-           > 
-           </Product>) }
+           {
+           products.map ( (element)=> 
+           <Product
+                key ={ element.key}
+                showAddCart ={true} product ={element}
+                handleAddedProduct ={handleAddedProduct}> 
+           </Product>) 
+           }
             </div>
             <div className='cart-container'>
-             <Cart cart ={cart}></Cart>
+             <Cart cart ={cart}>
+                    <NavLink to = "/review">
+                    
+                        <button className='cart-btn'> Review Order</button>
+                    
+                    </NavLink>
+             </Cart>
             </div>
            
 
