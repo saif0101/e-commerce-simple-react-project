@@ -4,6 +4,8 @@ const ReviewItem = (props) => {
     const {name,img,quantity,price,id} = props.product;
     return (
         <div>
+            <h4> <span className='justify-content- center'>Your Ordered Product Review:</span> </h4>
+           
              <div className='product'>
            <div >
              <img src={img} alt='' />

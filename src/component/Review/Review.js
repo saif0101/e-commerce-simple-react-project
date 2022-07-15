@@ -4,15 +4,15 @@ import fakeData from '../../fakeData/products.json';
 import ReviewItem from '../ReviewItem/ReviewItem';
 import Cart from '../Cart/Cart';
 import ConfirmImage from '../../images/giphy.gif'
+import { useNavigate } from 'react-router-dom';
 
 const Review = () => {
     const [cart,setCart] = useState([]);
     const [orderPlaced,setOrderPlaced] = useState(false);
+    const navigate = useNavigate()
 
-    const handlePlaceOrder = ()=>{
-        setCart([]);
-        setOrderPlaced(true);
-        processOrder();
+    const handleProceedOrder = ()=>{
+        navigate("/shipment", { replace: true });
 
     }
     
@@ -54,7 +54,7 @@ const Review = () => {
            <div className='cart-container'>
 
             <Cart cart ={cart}>
-                <button onClick={handlePlaceOrder} className='cart-btn'> Place Order</button>
+                <button onClick={handleProceedOrder} className='cart-btn'> Proceed Order</button>
             </Cart>
            </div>
           

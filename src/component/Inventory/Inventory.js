@@ -3,7 +3,7 @@ import React from 'react';
 const Inventory = () => {
     return (
         <div>
-            i will manage you
+          <h1>  i will manage you</h1>
             
         </div>
     );
