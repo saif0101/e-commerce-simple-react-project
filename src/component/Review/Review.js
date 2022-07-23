@@ -30,7 +30,7 @@ const Review = () => {
             dbProduct.quantity = savedCart[key];
             return dbProduct;
         });
-        setCart(cartProducts);
+        setCart(cartProducts); 
 
     },[])
     

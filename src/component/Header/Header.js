@@ -17,7 +17,7 @@ const Header = () => {
             <NavLink to="/review">Review Order</NavLink>
             <NavLink to="/manage">Manage Inventory </NavLink>
             {loggedInUser.email? <button onClick={()=>setLoggedInUser({})}>Sign Out</button> : <NavLink to="/login">Sign In</NavLink>}
-            <h3 style={{color:'yellow',fontSize:'20px'}}>User: {loggedInUser.email}</h3>
+            {/* {loggedInUser.email? <h3 style={{color:'yellow',fontSize:'20px'}}>User: {loggedInUser.email}</h3> : <h3></h3> } */}
             </div>
   
           </nav>

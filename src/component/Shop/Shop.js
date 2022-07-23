@@ -27,7 +27,7 @@ const Shop = () => {
     const savedCart = getDatabaseCart();
     const productKeys = Object.keys (savedCart);
     const previousCart = productKeys.map ((existingkey) => {
-        const product = fakeData.find ( (pd) => pd.key === existingkey);
+        const product = fakeData.find ( pd => pd.key===existingkey);
         product.quantity = savedCart[existingkey];
         return product;
     })
@@ -37,13 +37,13 @@ const Shop = () => {
 
    const handleAddedProduct =(productadd)=>{
     const toBeAdded = productadd.key;
-    const sameProduct = cart.find( pd => pd.key === toBeAdded);
+    const sameProduct = cart.find( pd => pd.key===toBeAdded);
     let count=1;
     let newCart;
     if (sameProduct){
          count = sameProduct.quantity +1;
         sameProduct.quantity = count;
-        const others = cart.filter ( pd => pd.key !== toBeAdded);
+        const others = cart.filter ( pd => pd.key!==toBeAdded);
         newCart =[...others,sameProduct];
     }
     else{

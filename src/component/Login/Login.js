@@ -1,7 +1,16 @@
 import React from 'react';
 import { initializeApp } from 'firebase/app';
 import firebaseConfig from './firebase.config';
-import { getAuth,updateProfile, signInWithPopup, FacebookAuthProvider, GoogleAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth,
+   updateProfile,
+   sendPasswordResetEmail ,
+   sendEmailVerification, 
+   signInWithPopup, 
+   FacebookAuthProvider, 
+   GoogleAuthProvider, 
+   signOut, 
+   createUserWithEmailAndPassword,
+   signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from 'react';
 import { useContext } from 'react';
 import { UserContext } from '../../App';
@@ -23,7 +32,10 @@ function Login() {
     password: ''
   });
 
-  const [loggedInUser,setLoggedInUser]= useContext(UserContext);
+  const [loggedInUser, setLoggedInUser] = useContext(UserContext);
+
+  // private route
+  
   let navigate = useNavigate();
   let location = useLocation();
   let from = location.state?.from?.pathname || "/";
@@ -31,7 +43,7 @@ function Login() {
   const provider = new GoogleAuthProvider();
   const fbProvider = new FacebookAuthProvider();
 
-// google sign in part
+  // google sign in part
   const handleGoogleSingIn = () => {
     const auth = getAuth();
     signInWithPopup(auth, provider)
@@ -51,7 +63,7 @@ function Login() {
         console.log(result);
 
       })
-      .cath(error => {
+      .catch(error => {
         console.log(error);
         console.log(error.message);
       })
@@ -92,8 +104,8 @@ function Login() {
 
 
         // ...
-      setLoggedInUser(user);
-      navigate(from, { replace: true });
+        setLoggedInUser(user);
+        navigate(from, { replace: true });
       })
       .catch((error) => {
         // Handle Errors here.
@@ -109,127 +121,159 @@ function Login() {
       });
 
   }
-// sign in using log in form part
-   const handleChange = (e) => {
-        let isFieldValid = true;
-        if (e.target.name === "email") {
-          isFieldValid = /\S+@\S+\.\S+/.test(e.target.value);
-        }
-        if (e.target.name === "password") {
-          const isValidPass = e.target.value.length > 6;
-          const passValid = /\d{1}/.test(e.target.value);
-          isFieldValid = isValidPass && passValid;
-        }
-        if (isFieldValid) {
+  // sign in using log in form part
+  const handleChange = (e) => {
+    let isFieldValid = true;
+    if (e.target.name === "email") {
+      isFieldValid = /\S+@\S+\.\S+/.test(e.target.value);
+    }
+    if (e.target.name === "password") {
+      const isValidPass = e.target.value.length > 6;
+      const passValid = /\d{1}/.test(e.target.value);
+      isFieldValid = isValidPass && passValid;
+    }
+    if (isFieldValid) {
+      const newUSerInfo = { ...user };
+      newUSerInfo[e.target.name] = e.target.value;
+      console.log(newUSerInfo);
+      setUSer(newUSerInfo);
+    }
+  }
+  const handleSubmit = (e) => {
+    if (newUser && user.email && user.password) {
+      const auth = getAuth(app);
+      createUserWithEmailAndPassword(auth, user.email, user.password)
+        .then(res => {
+          // Signed in 
+          //  const user = userCredential.user;
           const newUSerInfo = { ...user };
-          newUSerInfo[e.target.name] = e.target.value;
-          console.log(newUSerInfo);
+          newUSerInfo.error = '';
+          newUSerInfo.success = true;
           setUSer(newUSerInfo);
-        }
-      }
-    const handleSubmit = (e) => {
-        if (newUser && user.email && user.password) {
-          const auth = getAuth(app);
-          createUserWithEmailAndPassword(auth, user.email, user.password)
-            .then(res => {
-              // Signed in 
-              //  const user = userCredential.user;
-              const newUSerInfo = { ...user };
-              newUSerInfo.error = '';
-              newUSerInfo.success = true;
-              setUSer(newUSerInfo);
-              updateUserName(user.name);
-              setLoggedInUser(newUSerInfo);
-              navigate(from, { replace: true });
+          updateUserName(user.name);
+          setLoggedInUser(newUSerInfo);
+          emailVerification();
+          navigate(from, { replace: true });
 
-            })
-            .catch((error) => {
+        })
+        .catch((error) => {
 
-              const newUSerInfo = { ...user };
-              newUSerInfo.error = error.message;
-              newUSerInfo.success = false;
-              setUSer(newUSerInfo);
+          const newUSerInfo = { ...user };
+          newUSerInfo.error = error.message;
+          newUSerInfo.success = false;
+          setUSer(newUSerInfo);
 
-              // ..
-            });
-
-        }
-
-        if (!newUser && user.email && user.password) {
-          const auth = getAuth();
-          signInWithEmailAndPassword(auth, user.email, user.password)
-            .then((userCredential) => {
-              // Signed in 
-              const user = userCredential.user;
-              const newUSerInfo = { ...user };
-              newUSerInfo.error = '';
-              newUSerInfo.success = true;
-              setUSer(newUSerInfo);
-              setLoggedInUser(newUSerInfo);
-              navigate(from, { replace: true });
-              console.log(user)
-              // ...
-            })
-            .catch((error) => {
-              const newUSerInfo = { ...user };
-              newUSerInfo.error = error.message;
-              newUSerInfo.success = false;
-              setUSer(newUSerInfo);
-            });
-
-        }
-        e.preventDefault();
-      }
-      const updateUserName = name => {
-        const auth = getAuth();
-        updateProfile(auth.currentUser, {
-          displayName: name
-        }).then(() => {
-          // Profile updated!
-          // ...
-        }).catch((error) => {
-          // An error occurred
-          // ...
+          // ..
         });
 
+    }
+
+    // email verification
+    const emailVerification = () => {
+      const auth = getAuth();
+      sendEmailVerification(auth.currentUser)
+        .then(() => {
+          // Email verification sent!
+          // ...
+        });
+    }
+
+    if (!newUser && user.email && user.password) {
+      const auth = getAuth();
+      signInWithEmailAndPassword(auth, user.email, user.password)
+        .then((userCredential) => {
+          // Signed in 
+          const user = userCredential.user;
+          const newUSerInfo = { ...user };
+          newUSerInfo.error = '';
+          newUSerInfo.success = true;
+          setUSer(newUSerInfo);
+          setLoggedInUser(newUSerInfo);
+          navigate(from, { replace: true });
+          console.log(user)
+          // ...
+        })
+        .catch((error) => {
+          const newUSerInfo = { ...user };
+          newUSerInfo.error = error.message;
+          newUSerInfo.success = false;
+          setUSer(newUSerInfo);
+        });
+
+    }
+    e.preventDefault();
+  }
+
+
+
+
+  const updateUserName = name => {
+    const auth = getAuth();
+    updateProfile(auth.currentUser, {
+      displayName: name
+    }).then(() => {
+      // Profile updated!
+      // ...
+    }).catch((error) => {
+      // An error occurred
+      // ...
+    });
+
+  }
+      // reset password
+      const resetPassword = () => {
+    const auth = getAuth();
+    sendPasswordResetEmail(auth, user.email)
+      .then(() => {
+        // Password reset email sent!
+        // ..
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // ..
+      }); 
+  }
+
+
+  return (
+    <div style={{ textAlign: 'center' }}>
+
+
+      {user.isSignedIn ? <button onClick={handleSingOut}> Sing out </button> : <button onClick={handleGoogleSingIn}> Sing In</button>}
+      <br />
+      <button onClick={handleFbSingIn}> Sing In with Facebook </button>
+
+      {
+        user.isSignedIn &&
+        <div>
+          <h1> Welcome {user.name} </h1>
+          <h4> Your email : {user.email}</h4>
+          <img src={user.photo} alt="photoURL" />
+
+        </div>
       }
 
-
-      return (
-        <div style={{textAlign: 'center'}}>
-
-
-          {user.isSignedIn ? <button onClick={handleSingOut}> Sing out </button> : <button onClick={handleGoogleSingIn}> Sing In</button>}
-          <br />
-          <button onClick={handleFbSingIn}> Sing In with Facebook </button>
-
-          {
-            user.isSignedIn &&
-            <div>
-              <h1> Welcome {user.name} </h1>
-              <h4> Your email : {user.email}</h4>
-              <img src={user.photo} alt="photoURL" />
-
-            </div>
-          }
-
-          <h4> Sign in Here</h4>
-          <input type="checkbox" onChange={() => setNewUser(!newUser)} name=" newUser" />
-          <label htmlFor="newUSer">New USer Sign Up</label>
-          <form onSubmit={handleSubmit}>
-            {
-              newUser && <input type="text" name="name" placeholder='type your name' onBlur={handleChange} />
-            }
-            <br />
-            <input type="email" name="email" onBlur={handleChange} placeholder='type your email' required />
-            <br />
-            <input type="password" name="password" onBlur={handleChange} placeholder='type your password' required />
-            <br />
-            <input type="submit" value={newUser ? 'Sign Up' : 'Sign In'} />
-          </form>
-          {user.error && <p style={{ color: 'red' }} > The email is in Used</p>}
-          {user.success && <p style={{ color: 'green' }} > User {newUser ? 'Created' : 'Login'} Succesfully</p>}
-        </div>
-      );
-    }
+      <h4> Sign in Here</h4>
+      <input type="checkbox" onChange={() => setNewUser(!newUser)} name=" newUser" />
+      <label htmlFor="newUSer">New USer Sign Up</label>
+      <form onSubmit={handleSubmit}>
+        {
+          newUser && <input type="text" name="name" placeholder='type your name' onBlur={handleChange} />
+        }
+        <br />
+        <input type="email" name="email" onBlur={handleChange} placeholder='type your email' required />
+        <br />
+        <input type="password" name="password" onBlur={handleChange} placeholder='type your password' required />
+        <br />
+        <br />
+        <input type="submit" value={newUser ? 'Sign Up' : 'Sign In'} />
+      </form>
+      <br />
+      <button onClick={resetPassword}> Forget Or Reset Password</button>
+      {user.error && <p style={{ color: 'red' }} > The email is in Used</p>}
+      {user.success && <p style={{ color: 'green' }} > User {newUser ? 'Created' : 'Login'} Succesfully</p>}
+    </div>
+  );
+}
 export default Login;
